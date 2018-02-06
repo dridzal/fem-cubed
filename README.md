@@ -1,2 +1,2 @@
 # fem-cubed
-(FEM)^3: Finite Element Modeling For ElectroMagnetics For Exascale Machines
+(FEM)³: Finite Element Modeling For ElectroMagnetics For Exascale Machines
