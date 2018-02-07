@@ -1,0 +1,6 @@
+#ifndef FEM_Cubed_CONFIG_HPP
+#define FEM_Cubed_CONFIG_HPP
+
+#include "PanzerCore_config.hpp"
+
+#endif
