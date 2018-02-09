@@ -1,0 +1,26 @@
+EXTRA_ARGS=$@
+
+cmake \
+-G Ninja \
+-D Trilinos_ENABLE_Fortran=OFF \
+-D Trilinos_EXTRA_REPOSITORIES=fem-cubed \
+-D CMAKE_BUILD_TYPE:STRING=RELEASE \
+-D TPL_ENABLE_MPI:BOOL=ON \
+-D BUILD_SHARED_LIBS:BOOL=ON \
+-D Trilinos_ENABLE_EXPLICIT_INSTANTIATION:BOOL=ON \
+-D TPL_ENABLE_Boost=ON \
+-D Boost_INCLUDE_DIRS=/projects/sems/install/rhel6-x86_64/sems/tpl/boost/1.63.0/gcc/6.1.0/base/include \
+-D BoostLib_INCLUDE_DIRS=/projects/sems/install/rhel6-x86_64/sems/tpl/boost/1.63.0/gcc/6.1.0/base/include \
+-D BoostLib_LIBRARY_DIRS=/projects/sems/install/rhel6-x86_64/sems/tpl/boost/1.63.0/gcc/6.1.0/base/lib \
+-D Trilinos_ENABLE_FEM-Cubed:BOOL=ON \
+-D Trilinos_ENABLE_ALL_OPTIONAL_PACKAGES:BOOL=ON \
+-D Trilinos_ENABLE_TESTS:BOOL=OFF \
+-D Trilinos_ENABLE_EXAMPLES:BOOL=OFF \
+-D FEM-Cubed_ENABLE_TESTS:BOOL=ON \
+-D FEM-Cubed_ENABLE_EXAMPLES:BOOL=ON \
+-D Tpetra_SHOW_DEPRECATED_WARNINGS=OFF \
+-D CMAKE_INSTALL_PREFIX:PATH=/home/dridzal/development/Trilinos/BUILD/FEM-Cubed/install \
+-D TPL_BLAS_LIBRARIES:STRING=/usr/lib64/libblas.so.3 \
+-D TPL_LAPACK_LIBRARIES:STRING=/usr/lib64/liblapack.so.3 \
+$EXTRA_ARGS \
+../../../Trilinos

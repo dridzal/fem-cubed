@@ -1,0 +1,5 @@
+[dridzal@optimizer FEM-Cubed]$ module list
+Currently Loaded Modulefiles:
+  1) sems-env                         4) sems-python/2.7.9                7) sems-netcdf/4.4.1/exo_parallel  10) sems-hdf5/1.8.12/parallel
+  2) sems-gcc/6.1.0                   5) sems-boost/1.63.0/base           8) sems-git/2.10.1                 11) sems-apr/1.5.2
+  3) sems-openmpi/1.10.1              6) sems-gdb/7.9.1                   9) sems-cmake/3.5.2                12) sems-apr_util/1.5.4
