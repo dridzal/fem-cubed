@@ -24,8 +24,8 @@ namespace FEM3 {
 					  const bool build_transient_support);
     
     void buildAndRegisterEquationSetEvaluators(PHX::FieldManager<panzer::Traits>& fm,
-					       const panzer::FieldLibrary& field_library, 
-                                               const Teuchos::ParameterList& user_data) const;
+					       const panzer::FieldLibrary& /* field_library */, 
+                                               const Teuchos::ParameterList& /* user_data */) const;
 
     void buildAndRegisterScatterEvaluators(PHX::FieldManager<panzer::Traits>& fm,
 					   const panzer::FieldLibrary& field_library, 

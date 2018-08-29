@@ -8,6 +8,7 @@
 #include "FEM3_EquationSet_Maxwell.hpp"
 
 #include "FEM3_AuxiliaryEquationSet_MassMatrix.hpp"
+#include "FEM3_AuxiliaryEquationSet_CurlCurl.hpp"
 #include "FEM3_AuxiliaryEquationSet_WeakGradient.hpp"
 #include "FEM3_AuxiliaryEquationSet_MACROS.hpp"
 
@@ -16,6 +17,8 @@ namespace FEM3 {
   PANZER_DECLARE_EQSET_TEMPLATE_BUILDER(EquationSet_Maxwell, EquationSet_Maxwell)
 
   AUX_DECLARE_EQSET_TEMPLATE_BUILDER(AuxiliaryEquationSet_MassMatrix, AuxiliaryEquationSet_MassMatrix)
+
+  AUX_DECLARE_EQSET_TEMPLATE_BUILDER(AuxiliaryEquationSet_CurlCurl, AuxiliaryEquationSet_CurlCurl)
 
   AUX_DECLARE_EQSET_TEMPLATE_BUILDER(AuxiliaryEquationSet_WeakGradient, AuxiliaryEquationSet_WeakGradient)
 
@@ -41,6 +44,8 @@ namespace FEM3 {
       PANZER_BUILD_EQSET_OBJECTS("Maxwell",              EquationSet_Maxwell)
 
       AUX_BUILD_EQSET_OBJECTS("Auxiliary Mass Matrix",   AuxiliaryEquationSet_MassMatrix)
+
+      AUX_BUILD_EQSET_OBJECTS("Auxiliary Curl Curl",   AuxiliaryEquationSet_CurlCurl)
 
       AUX_BUILD_EQSET_OBJECTS("Auxiliary Weak Gradient", AuxiliaryEquationSet_WeakGradient)
 

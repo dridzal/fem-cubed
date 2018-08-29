@@ -1,5 +1,5 @@
-#ifndef _FEM3_AuxiliaryEquationSet_MassMatrix_hpp_
-#define _FEM3_AuxiliaryEquationSet_MassMatrix_hpp_
+#ifndef _FEM3_AuxiliaryEquationSet_CurlCurl_hpp_
+#define _FEM3_AuxiliaryEquationSet_CurlCurl_hpp_
 
 #include <vector>
 #include <string>
@@ -12,17 +12,17 @@
 namespace FEM3 {
 
   template <typename EvalT>
-  class AuxiliaryEquationSet_MassMatrix : public panzer::EquationSet_DefaultImpl<EvalT> {
+  class AuxiliaryEquationSet_CurlCurl : public panzer::EquationSet_DefaultImpl<EvalT> {
 
-  public:    
+  public:
 
-    AuxiliaryEquationSet_MassMatrix(const Teuchos::RCP<panzer::GlobalEvaluationDataContainer> & gedc,
+    AuxiliaryEquationSet_CurlCurl(const Teuchos::RCP<panzer::GlobalEvaluationDataContainer> & gedc,
                              const Teuchos::RCP<Teuchos::ParameterList>& params,
 			     const int& default_integration_order,
 			     const panzer::CellData& cell_data,
 		             const Teuchos::RCP<panzer::GlobalData>& global_data,
 		             const bool build_transient_support);
-    
+
     void buildAndRegisterEquationSetEvaluators(PHX::FieldManager<panzer::Traits>& fm,
 					       const panzer::FieldLibrary& /* field_library */,
                                                const Teuchos::ParameterList& /* user_data */) const;
@@ -41,7 +41,7 @@ namespace FEM3 {
   };
 
 template < >
-void AuxiliaryEquationSet_MassMatrix<panzer::Traits::Jacobian>::
+void AuxiliaryEquationSet_CurlCurl<panzer::Traits::Jacobian>::
 buildAndRegisterScatterEvaluators(PHX::FieldManager<panzer::Traits>& fm,
 				  const panzer::FieldLibrary& field_library,
                                   const panzer::LinearObjFactory<panzer::Traits> & lof,

@@ -130,9 +130,11 @@ int main(int argc,char * argv[])
       bool print_diagnostics = false;
       int numTimeSteps = 1;
       bool use_exo = false;
+      std::string exofile = "mesh_brick16.e";
 
       Teuchos::CommandLineProcessor clp;
       clp.setOption("use-exo","native-mesher",&use_exo);
+      clp.setOption("exo-file",&exofile);
       clp.setOption("x-elements",&x_elements);
       clp.setOption("y-elements",&y_elements);
       clp.setOption("z-elements",&z_elements);
@@ -164,7 +166,7 @@ int main(int argc,char * argv[])
       if (use_exo) {
         mesh_factory = Teuchos::rcp(new panzer_stk::STK_ExodusReaderFactory());
         // pl->set("File Name",settings->sublist("Mesh").get<std::string>("Mesh_File","mesh.exo"));  //syntax for xml file
-        pl->set("File Name","mesh_brick32.e");
+        pl->set("File Name",exofile);
       }
       else {
         pl->set("X Blocks",1);

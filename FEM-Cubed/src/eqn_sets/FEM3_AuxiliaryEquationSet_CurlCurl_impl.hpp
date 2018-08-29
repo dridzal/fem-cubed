@@ -1,5 +1,5 @@
-#ifndef _FEM3_AuxiliaryEquationSet_MassMatrix_impl_hpp_
-#define _FEM3_AuxiliaryEquationSet_MassMatrix_impl_hpp_
+#ifndef _FEM3_AuxiliaryEquationSet_CurlCurl_impl_hpp_
+#define _FEM3_AuxiliaryEquationSet_CurlCurl_impl_hpp_
 
 #include "Teuchos_ParameterList.hpp"
 #include "Teuchos_RCP.hpp"
@@ -15,7 +15,7 @@
 // include evaluators here
 #include "Panzer_Integrator_BasisTimesScalar.hpp"
 #include "Panzer_Integrator_BasisTimesVector.hpp"
-#include "Panzer_Integrator_GradBasisDotVector.hpp"
+#include "Panzer_Integrator_CurlBasisDotVector.hpp"
 #include "Panzer_ScalarToVector.hpp"
 #include "Panzer_Sum.hpp"
 #include "Panzer_Constant.hpp"
@@ -27,8 +27,8 @@
 
 // ***********************************************************************
 template <typename EvalT>
-FEM3::AuxiliaryEquationSet_MassMatrix<EvalT>::
-AuxiliaryEquationSet_MassMatrix(
+FEM3::AuxiliaryEquationSet_CurlCurl<EvalT>::
+AuxiliaryEquationSet_CurlCurl(
                    const Teuchos::RCP<panzer::GlobalEvaluationDataContainer> & gedc,
                    const Teuchos::RCP<Teuchos::ParameterList>& params,
 		   const int& default_integration_order,
@@ -46,7 +46,7 @@ AuxiliaryEquationSet_MassMatrix(
     valid_parameters.set("Multiplier",1.0,"Scale the operator");
     Teuchos::RCP<const std::vector<std::string> > fieldMultiplier;
     valid_parameters.set("Field Multipliers",fieldMultiplier,"Scale the operator");
-    valid_parameters.set("Basis Type","HGrad","Type of Basis to use");
+    valid_parameters.set("Basis Type","HCurl","Type of Basis to use");
     valid_parameters.set("Basis Order",1,"Order of the basis");
     valid_parameters.set("Integration Order",default_integration_order,"Order of the integration rule");
 
@@ -70,7 +70,7 @@ AuxiliaryEquationSet_MassMatrix(
   m_dof_names->push_back(dof_name);
 
   this->addDOF(dof_name,basis_type,basis_order,integration_order,"AUX_MASS_RESIDUAL_"+dof_name);
-  this->addDOFGrad(dof_name,"GRAD_"+dof_name);
+  this->addDOFCurl(dof_name,"Curl_"+dof_name);
 
   this->addClosureModel(model_id);
 
@@ -79,7 +79,7 @@ AuxiliaryEquationSet_MassMatrix(
 
 // ***********************************************************************
 template <typename EvalT>
-void FEM3::AuxiliaryEquationSet_MassMatrix<EvalT>::
+void FEM3::AuxiliaryEquationSet_CurlCurl<EvalT>::
 buildAndRegisterEquationSetEvaluators(PHX::FieldManager<panzer::Traits>& fm,
 				      const panzer::FieldLibrary& /* field_library */,
 				      const Teuchos::ParameterList& /* user_data */) const
@@ -87,66 +87,38 @@ buildAndRegisterEquationSetEvaluators(PHX::FieldManager<panzer::Traits>& fm,
   using panzer::BasisIRLayout;
   using panzer::EvaluatorStyle;
   using panzer::IntegrationRule;
-  using panzer::Integrator_BasisTimesScalar;
-  using panzer::Integrator_BasisTimesVector;
+  using panzer::Integrator_CurlBasisDotVector;
   using panzer::Traits;
   using PHX::Evaluator;
   using std::string;
   using Teuchos::ParameterList;
   using Teuchos::RCP;
   using Teuchos::rcp;
-  
-  RCP<IntegrationRule> ir = this->getIntRuleForDOF(dof_name); 
-  RCP<BasisIRLayout> basis = this->getBasisIRLayoutForDOF(dof_name); 
 
-  // Mass Operator
+  RCP<IntegrationRule> ir = this->getIntRuleForDOF(dof_name);
+  RCP<BasisIRLayout> basis = this->getBasisIRLayoutForDOF(dof_name);
+
+  // Curl curl Operator
   {
-    if (basis->getBasis()->isScalarBasis())
     {
-      ParameterList p("Mass Matrix " + dof_name + " Residual");
-      p.set("Residual Name", "AUX_MASS_RESIDUAL_"+dof_name);
-      p.set("Value Name", dof_name);
+      ParameterList p("Curl Curl " + dof_name + " Residual");
+      p.set("Residual Name", "AUX_CURL_CURL_RESIDUAL_"+dof_name);
+      p.set("Value Name", "Curl_"+dof_name);
       p.set("Basis", basis);
       p.set("IR", ir);
       p.set("Multiplier", multiplier);
       if (fieldMultipliers != Teuchos::null)
         p.set("Field Multipliers", fieldMultipliers);
-      // string resName("AUX_MASS_RESIDUAL_" + dof_name), valName(dof_name);
-      // RCP<Evaluator<Traits>> op;
-      // if (fieldMultipliers != Teuchos::null)
-      //   op = rcp(new
-      //            Integrator_BasisTimesScalar<EvalT, Traits>(EvaluatorStyle::EVALUATES,
-      //                                                       resName, valName, *basis, *ir, multiplier, *fieldMultipliers));
-      // else
-      //   op = rcp(new
-      //            Integrator_BasisTimesScalar<EvalT, Traits>(EvaluatorStyle::EVALUATES,
-      //                                                       resName, valName, *basis, *ir, multiplier));
-      RCP<Evaluator<Traits>> op = rcp(new
-        Integrator_BasisTimesScalar<EvalT, Traits>(p));
+      RCP<Evaluator<Traits> > op = rcp(new
+        Integrator_CurlBasisDotVector<EvalT, Traits>(p));
       fm.template registerEvaluator<EvalT>(op);
     }
-    else if (basis->getBasis()->isVectorBasis())
-    { 
-      ParameterList p("Mass Matrix " + dof_name + " Residual");
-      p.set("Residual Name", "AUX_MASS_RESIDUAL_"+dof_name);
-      p.set("Value Name", dof_name);
-      p.set("Basis", basis);
-      p.set("IR", ir);
-      p.set("Multiplier", multiplier);
-      if (fieldMultipliers != Teuchos::null)
-        p.set("Field Multipliers", fieldMultipliers);
-      RCP<Evaluator<Traits>> op = rcp(new
-        Integrator_BasisTimesVector<EvalT, Traits>(p));
-      fm.template registerEvaluator<EvalT>(op);
-    }
-    else
-      TEUCHOS_ASSERT(false);
   }
 }
 
 // ***********************************************************************
 template <typename EvalT >
-void FEM3::AuxiliaryEquationSet_MassMatrix<EvalT>::
+void FEM3::AuxiliaryEquationSet_CurlCurl<EvalT>::
 buildAndRegisterScatterEvaluators(PHX::FieldManager<panzer::Traits>& /* fm */,
 				  const panzer::FieldLibrary& /* field_library */,
                                   const panzer::LinearObjFactory<panzer::Traits> & /* lof */,
@@ -156,7 +128,7 @@ buildAndRegisterScatterEvaluators(PHX::FieldManager<panzer::Traits>& /* fm */,
 
 // ***********************************************************************
 template < >
-void FEM3::AuxiliaryEquationSet_MassMatrix<panzer::Traits::Jacobian>::
+void FEM3::AuxiliaryEquationSet_CurlCurl<panzer::Traits::Jacobian>::
 buildAndRegisterScatterEvaluators(PHX::FieldManager<panzer::Traits>& fm,
 				  const panzer::FieldLibrary& field_library,
                                   const panzer::LinearObjFactory<panzer::Traits> & lof,
@@ -179,7 +151,7 @@ buildAndRegisterScatterEvaluators(PHX::FieldManager<panzer::Traits>& fm,
    typedef typename panzer::BlockedEpetraLinearObjFactory<panzer::Traits,LocalOrdinalEpetra> epetraLinObjFactory;
 
    std::string fieldStr = (*this->m_dof_names)[0];
-   const std::string residualField = "AUX_MASS_RESIDUAL_"+dof_name; 
+   const std::string residualField = "AUX_CURL_CURL_RESIDUAL_"+dof_name;
    int pFieldNum;
    int blockIndex;
 
@@ -260,7 +232,7 @@ buildAndRegisterScatterEvaluators(PHX::FieldManager<panzer::Traits>& fm,
      TEUCHOS_ASSERT(false);
 
    {
-      RCP<std::map<std::string,std::string> > resToField 
+      RCP<std::map<std::string,std::string> > resToField
          = rcp(new std::map<std::string,std::string>);
       (*resToField)[outPrefix+residualField] = dof_name;
 
@@ -268,14 +240,14 @@ buildAndRegisterScatterEvaluators(PHX::FieldManager<panzer::Traits>& fm,
          = rcp(new std::vector<std::string>);
       inFieldNames->push_back(outPrefix+residualField);
 
-      std::string scatterName = "AUX_"+dof_name+"_MassMatrix";
+      std::string scatterName = "AUX_"+dof_name+"_CurlCurl";
 
       Teuchos::ParameterList p("Scatter:" + scatterName);
       p.set("Scatter Name", scatterName);
       p.set("Basis",field_library.lookupBasis(fieldStr));
       p.set("Dependent Names", inFieldNames);
       p.set("Dependent Map", resToField);
-      p.set("Global Data Key", "Mass Matrix " + dof_name + " Scatter Container");
+      p.set("Global Data Key", "Curl Curl " + dof_name + " Scatter Container");
 
       RCP< PHX::Evaluator<panzer::Traits> > op = nlof->buildScatter<EvalT>(p);
 
@@ -284,11 +256,11 @@ buildAndRegisterScatterEvaluators(PHX::FieldManager<panzer::Traits>& fm,
       PHX::Tag<EvalT::ScalarT> tag(scatterName, Teuchos::rcp(new PHX::MDALayout<panzer::Dummy>(0)));
       fm.requireField<EvalT>(tag);
    }
-   
-   if(!m_gedc->containsDataObject("Mass Matrix " + dof_name + " Scatter Container")) {
-      Teuchos::RCP<panzer::GlobalEvaluationData> dataObject 
+
+   if(!m_gedc->containsDataObject("Curl Curl " + dof_name + " Scatter Container")) {
+      Teuchos::RCP<panzer::GlobalEvaluationData> dataObject
          = Teuchos::rcp(new panzer::LOCPair_GlobalEvaluationData(nlof,panzer::LinearObjContainer::Mat));
-      m_gedc->addDataObject("Mass Matrix " + dof_name + " Scatter Container",dataObject);
+      m_gedc->addDataObject("Curl Curl " + dof_name + " Scatter Container",dataObject);
    }
 }
 
