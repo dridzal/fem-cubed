@@ -1,3 +1,1 @@
-## ADD_SUBDIRECTORY(LinearSolver)
-## ADD_SUBDIRECTORY(ExodusMesh)
 ADD_SUBDIRECTORY(ExoMultiMat)
